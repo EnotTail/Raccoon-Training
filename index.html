@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0f172a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Енотов Фитнес">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192.png">
+<link rel="icon" type="image/png" href="icons/favicon.ico">
+<title>Енотов Фитнес</title>
+<style>
+  :root {
+    --bg: #0b1120;
+    --card: #151e32;
+    --accent: #38bdf8;
+    --accent2: #f472b6;
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --text: #f1f5f9;
+    --text-dim: #94a3b8;
+    --border: #1e293b;
+    --border-light: #334155;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* --- ONBOARDING --- */
+  .onboarding {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(135deg, #0b1120 0%, #1e3a5f 100%);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    animation: fadeIn 0.5s ease;
+  }
+  .onboarding.hidden { display: none; }
+  .onboarding-logo {
+    font-size: 72px;
+    margin-bottom: 8px;
+  }
+  .onboarding h1 {
+    font-size: 26px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+  .onboarding-sub {
+    color: var(--text-dim);
+    font-size: 14px;
+    margin-bottom: 32px;
+  }
+  .onboarding-form {
+    width: 100%;
+    max-width: 360px;
+  }
+  .form-group {
+    margin-bottom: 16px;
+  }
+  .form-label {
+    display: block;
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .form-input {
+    width: 100%;
+    background: var(--card);
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    padding: 14px 16px;
+    color: var(--text);
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-input:focus { border-color: var(--accent); }
+  .gender-select {
+    display: flex;
+    gap: 10px;
+  }
+  .gender-btn {
+    flex: 1;
+    background: var(--card);
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    padding: 14px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 28px;
+  }
+  .gender-btn.selected {
+    border-color: var(--accent);
+    background: rgba(56, 189, 248, 0.1);
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+  }
+  .gender-label {
+    display: block;
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+  .target-preview {
+    background: rgba(34, 197, 94, 0.08);
+    border: 1px solid rgba(34, 197, 94, 0.25);
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+  .target-preview-label {
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+  .target-preview-value {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--success);
+  }
+  .btn-start {
+    width: 100%;
+    background: linear-gradient(135deg, var(--accent), #0ea5e9);
+    border: none;
+    border-radius: 12px;
+    padding: 16px;
+    color: white;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: all 0.2s;
+  }
+  .btn-start:active { transform: scale(0.98); opacity: 0.9; }
+  .onboarding-footer {
+    margin-top: 20px;
+    font-size: 12px;
+    color: var(--text-dim);
+    text-align: center;
+  }
+
+  /* --- APP --- */
+  .app-container {
+    display: none;
+    padding-bottom: 80px;
+  }
+  .app-container.active { display: block; }
+
+  .app-header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+    padding: 20px 16px 16px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .app-header h1 {
+    font-size: 20px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+  }
+  .app-header p {
+    color: var(--text-dim);
+    font-size: 12px;
+    margin-top: 4px;
+  }
+  .tab-bar {
+    display: flex;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 68px;
+    z-index: 99;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tab-bar::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    flex: 1;
+    min-width: 70px;
+    padding: 12px 8px;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .tab-btn .tab-icon { font-size: 18px; }
+  .tab-btn.active {
+    color: var(--accent);
+    border-bottom: 2px solid var(--accent);
+    background: rgba(56, 189, 248, 0.05);
+  }
+  .tab-content { display: none; padding: 16px; animation: fadeIn 0.3s ease; }
+  .tab-content.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 12px;
+    border: 1px solid var(--border);
+  }
+  .card-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .stat-card {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 14px 8px;
+    text-align: center;
+    border: 1px solid var(--border);
+  }
+  .stat-value {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--accent);
+  }
+  .stat-label {
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+
+  .bmi-track {
+    height: 10px;
+    background: #1e293b;
+    border-radius: 5px;
+    position: relative;
+    margin: 10px 0;
+    overflow: hidden;
+  }
+  .bmi-fill {
+    height: 100%;
+    width: 71%;
+    background: linear-gradient(90deg, var(--warning), var(--danger));
+    border-radius: 5px;
+  }
+  .bmi-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 9px;
+    color: var(--text-dim);
+  }
+
+  .water-tracker {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 10px 0;
+  }
+  .water-glass {
+    width: 36px;
+    height: 44px;
+    background: var(--border-light);
+    border-radius: 4px 4px 14px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+  .water-glass.filled {
+    background: linear-gradient(180deg, var(--accent), #0ea5e9);
+    color: white;
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+  }
+  .water-glass:active { transform: scale(0.92); }
+  .water-text {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-top: 6px;
+  }
+
+  .today-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .badge-workout { background: rgba(56, 189, 248, 0.15); color: var(--accent); }
+  .badge-walk { background: rgba(34, 197, 94, 0.15); color: var(--success); }
+  .badge-active { background: rgba(244, 114, 182, 0.15); color: var(--accent2); }
+  .badge-rest { background: rgba(148, 163, 184, 0.15); color: var(--text-dim); }
+
+  .meal-item, .schedule-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .meal-item:last-child, .schedule-item:last-child { border-bottom: none; }
+  .meal-time {
+    font-size: 12px;
+    color: var(--accent);
+    font-weight: 700;
+    min-width: 70px;
+  }
+  .meal-desc, .schedule-desc {
+    font-size: 13px;
+    color: var(--text-dim);
+    flex: 1;
+  }
+
+  .exercise-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .exercise-card {
+    background: rgba(56, 189, 248, 0.06);
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    border-radius: 12px;
+    padding: 14px 10px;
+    text-align: center;
+  }
+  .exercise-name { font-size: 13px; font-weight: 700; }
+  .exercise-reps { font-size: 12px; color: var(--accent); margin-top: 4px; }
+
+  .check-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+  }
+  .check-item:last-child { border-bottom: none; }
+  .check-box {
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--border-light);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .check-box.checked {
+    background: var(--success);
+    border-color: var(--success);
+    color: white;
+  }
+  .check-text { font-size: 14px; color: var(--text-dim); }
+  .check-text.done { color: var(--text); text-decoration: line-through; opacity: 0.5; }
+
+  .day-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .day-row:last-child { border-bottom: none; }
+  .day-name { font-size: 14px; font-weight: 700; min-width: 90px; }
+  .day-activity { font-size: 13px; color: var(--text-dim); flex: 1; }
+  .day-badge {
+    font-size: 10px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .weight-input {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .weight-input input {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border-light);
+    border-radius: 10px;
+    padding: 12px 14px;
+    color: var(--text);
+    font-size: 16px;
+    outline: none;
+  }
+  .weight-input input:focus { border-color: var(--accent); }
+  .btn {
+    background: linear-gradient(135deg, var(--accent), #0ea5e9);
+    border: none;
+    border-radius: 10px;
+    padding: 12px 20px;
+    color: white;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn:active { transform: scale(0.96); opacity: 0.9; }
+  .progress-list {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  .progress-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .progress-item:last-child { border-bottom: none; }
+  .progress-date { color: var(--text-dim); }
+  .progress-weight { font-weight: 700; color: var(--accent); }
+  .progress-diff { font-size: 12px; margin-left: 6px; }
+  .progress-diff.down { color: var(--success); }
+  .progress-diff.up { color: var(--danger); }
+
+  .rule-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 0;
+    font-size: 14px;
+    color: var(--text-dim);
+    border-bottom: 1px solid var(--border);
+  }
+  .rule-item:last-child { border-bottom: none; }
+  .rule-check { color: var(--success); font-weight: 700; font-size: 16px; flex-shrink: 0; }
+
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--card);
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-around;
+    padding: 8px 0;
+    z-index: 1000;
+  }
+  .nav-btn {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    cursor: pointer;
+    padding: 4px 12px;
+    transition: all 0.2s;
+  }
+  .nav-btn .nav-icon { font-size: 22px; }
+  .nav-btn.active { color: var(--accent); }
+  .nav-btn:active { transform: scale(0.9); }
+
+  .empty-state {
+    text-align: center;
+    padding: 30px;
+    color: var(--text-dim);
+    font-size: 14px;
+  }
+
+  .target-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    font-size: 13px;
+  }
+  .target-label { color: var(--text-dim); }
+  .target-value { font-weight: 700; color: var(--accent2); }
+
+  .settings-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 101;
+  }
+
+  .export-section {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .export-btn {
+    width: 100%;
+    background: var(--card);
+    border: 1px solid var(--border-light);
+    border-radius: 10px;
+    padding: 12px;
+    color: var(--text);
+    font-size: 14px;
+    cursor: pointer;
+    margin-bottom: 8px;
+    transition: all 0.2s;
+  }
+  .export-btn:active { background: var(--border); }
+  .export-area {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border-light);
+    border-radius: 10px;
+    padding: 10px;
+    color: var(--text-dim);
+    font-size: 11px;
+    font-family: monospace;
+    min-height: 60px;
+    resize: vertical;
+    outline: none;
+  }
+</style>
+</head>
+<body>
+
+<!-- ONBOARDING -->
+<div class="onboarding" id="onboarding">
+  <div class="onboarding-logo">🦝</div>
+  <h1>Енотов Фитнес</h1>
+  <p class="onboarding-sub">Персональный трекер фитнеса и питания</p>
+
+  <div class="onboarding-form">
+    <div class="form-group">
+      <label class="form-label">Пол</label>
+      <div class="gender-select">
+        <div class="gender-btn selected" id="genderMale" onclick="selectGender('male')">
+          👨
+          <span class="gender-label">Мужской</span>
+        </div>
+        <div class="gender-btn" id="genderFemale" onclick="selectGender('female')">
+          👩
+          <span class="gender-label">Женский</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Рост (см)</label>
+      <input type="number" class="form-input" id="obHeight" placeholder="Например: 181" min="100" max="250" oninput="updateTargetPreview()">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Текущий вес (кг)</label>
+      <input type="number" class="form-input" id="obWeight" placeholder="Например: 93" step="0.1" min="30" max="300" oninput="updateTargetPreview()">
+    </div>
+
+    <div class="target-preview" id="targetPreview" style="display:none;">
+      <div class="target-preview-label">Расчётный целевой вес</div>
+      <div class="target-preview-value" id="targetPreviewValue">-- кг</div>
+    </div>
+
+    <button class="btn-start" id="btnStart" onclick="startApp()">Начать</button>
+    <p class="onboarding-footer">Данные сохраняются только на вашем устройстве</p>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app-container" id="appContainer">
+  <div class="app-header">
+    <button class="settings-btn" onclick="showSettings()">⚙️</button>
+    <h1>🦝 Енотов Фитнес</h1>
+    <p>Персональный трекер</p>
+  </div>
+
+  <div class="tab-bar" id="tabBar">
+    <button class="tab-btn active" onclick="switchTab('today')">
+      <span class="tab-icon">📅</span>
+      <span>Сегодня</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('nutrition')">
+      <span class="tab-icon">🍽️</span>
+      <span>Питание</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('workout')">
+      <span class="tab-icon">🏋️</span>
+      <span>Треня</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('schedule')">
+      <span class="tab-icon">📆</span>
+      <span>Неделя</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('progress')">
+      <span class="tab-icon">📈</span>
+      <span>Прогресс</span>
+    </button>
+  </div>
+
+  <!-- TODAY TAB -->
+  <div class="tab-content active" id="tab-today">
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-value" id="todayWeight">--</div>
+        <div class="stat-label">кг</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="todayHeight">--</div>
+        <div class="stat-label">см</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" style="color:var(--accent2)" id="todayBMI">--</div>
+        <div class="stat-label">ИМТ</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📊 Индекс массы тела</div>
+      <div class="bmi-track"><div class="bmi-fill" id="bmiFill"></div></div>
+      <div class="bmi-labels">
+        <span>16</span><span>18.5</span><span>25</span><span>30</span><span>40</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; margin-top:4px; font-size:9px; color:var(--text-dim)">
+        <span>Дефицит</span><span>Норма</span><span>Избыток</span><span>Ожирение</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">💧 Трекер воды</div>
+      <div class="water-tracker" id="waterTracker"></div>
+      <div class="water-text" id="waterText">0 / 8 стаканов (0 мл)</div>
+    </div>
+
+    <div class="card" id="todayScheduleCard">
+      <div class="card-title">📅 Сегодня</div>
+      <div id="todayContent"></div>
+    </div>
+
+    <div class="card" id="todayNutritionCard">
+      <div class="card-title">🍽️ Питание сегодня</div>
+      <div id="todayNutrition"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">✅ 5 правил</div>
+      <div class="rule-item"><span class="rule-check">✓</span>Вода — 2 литра. Перед едой — стакан воды</div>
+      <div class="rule-item"><span class="rule-check">✓</span>Сон — 7–8 часов. Недосып = голод</div>
+      <div class="rule-item"><span class="rule-check">✓</span>Не есть за 3 часа до сна</div>
+      <div class="rule-item"><span class="rule-check">✓</span>Взвешивайся 1 раз в неделю, утром</div>
+      <div class="rule-item"><span class="rule-check">✓</span>Сорвался? Следующий приём — по плану</div>
+    </div>
+  </div>
+
+  <!-- NUTRITION TAB -->
+  <div class="tab-content" id="tab-nutrition">
+    <div class="card">
+      <div class="card-title">🍽️ Шаблон тарелки</div>
+      <div style="display:flex; gap:8px; margin-bottom:12px;">
+        <div style="flex:2; background:rgba(34,197,94,0.1); border:1px solid rgba(34,197,94,0.3); border-radius:10px; padding:12px; text-align:center;">
+          <div style="font-size:20px; font-weight:800; color:var(--success)">½</div>
+          <div style="font-size:11px; color:var(--text-dim)">Овощи</div>
+        </div>
+        <div style="flex:1; background:rgba(56,189,248,0.1); border:1px solid rgba(56,189,248,0.3); border-radius:10px; padding:12px; text-align:center;">
+          <div style="font-size:20px; font-weight:800; color:var(--accent)">¼</div>
+          <div style="font-size:11px; color:var(--text-dim)">Белок</div>
+        </div>
+        <div style="flex:1; background:rgba(244,114,182,0.1); border:1px solid rgba(244,114,182,0.3); border-radius:10px; padding:12px; text-align:center;">
+          <div style="font-size:20px; font-weight:800; color:var(--accent2)">¼</div>
+          <div style="font-size:11px; color:var(--text-dim)">Углеводы</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🌅 Завтрак</div>
+      <div class="meal-item"><span class="meal-time">Основа</span><span class="meal-desc">Овсянка на воде или молоке</span></div>
+      <div class="meal-item"><span class="meal-time">Белок</span><span class="meal-desc">1–2 яйца (варёных или омлет)</span></div>
+      <div class="meal-item"><span class="meal-time">Овощи</span><span class="meal-desc">Огурец, помидор, перец</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🌞 Обед</div>
+      <div class="meal-item"><span class="meal-time">Белок</span><span class="meal-desc">Куриная грудка, индейка, рыба</span></div>
+      <div class="meal-item"><span class="meal-time">Углеводы</span><span class="meal-desc">Гречка, рис бурый, макароны твёрдых сортов</span></div>
+      <div class="meal-item"><span class="meal-time">Овощи</span><span class="meal-desc">Салат из свежих овощей, заправка — лимон/йогурт</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🍎 Перекус</div>
+      <div class="meal-item"><span class="meal-time">Вариант 1</span><span class="meal-desc">Творог 5% — 150г</span></div>
+      <div class="meal-item"><span class="meal-time">Вариант 2</span><span class="meal-desc">Яблоко + горсть орехов (10–15 шт)</span></div>
+      <div class="meal-item"><span class="meal-time">Вариант 3</span><span class="meal-desc">Кефир / йогурт без сахара</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🌙 Ужин</div>
+      <div class="meal-item"><span class="meal-time">Белок</span><span class="meal-desc">Творог, рыба, яйца, курица</span></div>
+      <div class="meal-item"><span class="meal-time">Овощи</span><span class="meal-desc">Любые овощи на пару или в салате</span></div>
+      <div class="meal-item"><span class="meal-time">⚠️</span><span class="meal-desc">Углеводы на ужин — минимум или исключить</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🚫 Что убрать</div>
+      <div class="rule-item"><span class="rule-check" style="color:var(--danger)">✕</span>Сладкие напитки и соки</div>
+      <div class="rule-item"><span class="rule-check" style="color:var(--danger)">✕</span>Фастфуд, чипсы, снеки</div>
+      <div class="rule-item"><span class="rule-check" style="color:var(--danger)">✕</span>Алкоголь (максимально сократить)</div>
+      <div class="rule-item"><span class="rule-check" style="color:var(--warning)">⚠</span>Хлеб — макс. 1–2 ломтика, цельнозерновой</div>
+    </div>
+  </div>
+
+  <!-- WORKOUT TAB -->
+  <div class="tab-content" id="tab-workout">
+    <div class="card">
+      <div class="card-title">🏋️ Тренировка — 3 круга</div>
+      <div style="font-size:12px; color:var(--text-dim); margin-bottom:12px;">Отдых между упражнениями: 30–60 сек</div>
+      <div class="exercise-grid" id="workoutGrid"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">✅ Выполнение кругов</div>
+      <div class="check-item" onclick="toggleCheck(this, 'round1')">
+        <div class="check-box" id="round1"></div>
+        <span class="check-text" id="text-round1">Круг 1 выполнен</span>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this, 'round2')">
+        <div class="check-box" id="round2"></div>
+        <span class="check-text" id="text-round2">Круг 2 выполнен</span>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this, 'round3')">
+        <div class="check-box" id="round3"></div>
+        <span class="check-text" id="text-round3">Круг 3 выполнен</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🚶 Разминка (5 мин)</div>
+      <div class="meal-item"><span class="meal-time">1.</span><span class="meal-desc">Прыжки на месте — 1 мин</span></div>
+      <div class="meal-item"><span class="meal-time">2.</span><span class="meal-desc">Махи руками — 1 мин</span></div>
+      <div class="meal-item"><span class="meal-time">3.</span><span class="meal-desc">Наклоны корпуса — 1 мин</span></div>
+      <div class="meal-item"><span class="meal-time">4.</span><span class="meal-desc">Вращения суставов — 2 мин</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🧘 Заминка (3 мин)</div>
+      <div class="meal-item"><span class="meal-time">1.</span><span class="meal-desc">Растяжка ног — 1 мин</span></div>
+      <div class="meal-item"><span class="meal-time">2.</span><span class="meal-desc">Растяжка спины — 1 мин</span></div>
+      <div class="meal-item"><span class="meal-time">3.</span><span class="meal-desc">Растяжка плеч — 1 мин</span></div>
+    </div>
+  </div>
+
+  <!-- SCHEDULE TAB -->
+  <div class="tab-content" id="tab-schedule">
+    <div class="card">
+      <div class="card-title">📆 Недельное расписание</div>
+      <div id="weekSchedule"></div>
+    </div>
+  </div>
+
+  <!-- PROGRESS TAB -->
+  <div class="tab-content" id="tab-progress">
+    <div class="card">
+      <div class="card-title">📈 Отслеживание веса</div>
+      <div class="target-line"><span class="target-label">Текущий вес</span><span class="target-value" id="currentWeightDisplay">-- кг</span></div>
+      <div class="target-line"><span class="target-label">Целевой вес</span><span class="target-value" style="color:var(--success)" id="targetWeightDisplay">-- кг</span></div>
+      <div class="target-line"><span class="target-label">Темп</span><span class="target-value" style="color:var(--accent)">0.5–1 кг/нед</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">➕ Добавить запись</div>
+      <div class="weight-input">
+        <input type="number" id="weightInput" placeholder="Вес в кг" step="0.1" min="40" max="200">
+        <button class="btn" onclick="addWeight()">Добавить</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📋 История взвешиваний</div>
+      <div class="progress-list" id="progressList">
+        <div class="empty-state">Пока нет записей. Добавь первое взвешивание!</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">💾 Бэкап данных</div>
+      <button class="export-btn" onclick="exportData()">📤 Экспортировать данные</button>
+      <button class="export-btn" onclick="document.getElementById('importArea').style.display='block'">📥 Импортировать данные</button>
+      <div id="importArea" style="display:none;">
+        <textarea class="export-area" id="importInput" placeholder="Вставьте JSON-данные сюда..."></textarea>
+        <button class="btn" style="width:100%; margin-top:8px;" onclick="importData()">Импортировать</button>
+      </div>
+      <textarea class="export-area" id="exportOutput" style="display:none; margin-top:8px;" readonly></textarea>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <button class="nav-btn active" onclick="switchTab('today')">
+      <span class="nav-icon">📅</span>
+      <span>Сегодня</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('nutrition')">
+      <span class="nav-icon">🍽️</span>
+      <span>Питание</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('workout')">
+      <span class="nav-icon">🏋️</span>
+      <span>Треня</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('schedule')">
+      <span class="nav-icon">📆</span>
+      <span>Неделя</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('progress')">
+      <span class="nav-icon">📈</span>
+      <span>Прогресс</span>
+    </button>
+  </div>
+</div>
+
+<script>
+  // Register Service Worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(err => console.log('SW registration failed:', err));
+  }
+
+  // --- Data ---
+  const GLASSES = 8;
+  let profile = JSON.parse(localStorage.getItem('swf_profile') || 'null');
+  let weights = JSON.parse(localStorage.getItem('swf_weights') || '[]');
+
+  const workouts = {
+    legs: [
+      {name: 'Приседания', reps: '15–20 раз'},
+      {name: 'Выпады', reps: '10 на ногу'},
+      {name: 'Подъём таза', reps: '15 раз'},
+      {name: 'Планка', reps: '30–45 сек'},
+      {name: 'Скручивания', reps: '20 раз'},
+      {name: 'Берпи', reps: '8–10 раз'},
+      {name: 'Отжимания', reps: '10–15 раз'},
+      {name: 'Отдых', reps: '30–60 сек'}
+    ],
+    upper: [
+      {name: 'Отжимания', reps: '12–15 раз'},
+      {name: 'Берпи', reps: '8–10 раз'},
+      {name: 'Планка', reps: '40–50 сек'},
+      {name: 'Подъём таза', reps: '15 раз'},
+      {name: 'Приседания', reps: '12–15 раз'},
+      {name: 'Скручивания', reps: '25 раз'},
+      {name: 'Выпады', reps: '8 на ногу'},
+      {name: 'Отдых', reps: '30–60 сек'}
+    ],
+    full: [
+      {name: 'Берпи', reps: '10–12 раз'},
+      {name: 'Приседания', reps: '15–20 раз'},
+      {name: 'Отжимания', reps: '10–15 раз'},
+      {name: 'Выпады', reps: '10 на ногу'},
+      {name: 'Планка', reps: '45–60 сек'},
+      {name: 'Подъём таза', reps: '15 раз'},
+      {name: 'Скручивания', reps: '20 раз'},
+      {name: 'Отдых', reps: '30–60 сек'}
+    ]
+  };
+
+  const weeklyNutrition = {
+    0: { breakfast: 'Йогурт без сахара + ягоды + орехи', lunch: 'Куриный суп + гречка + салат', snack: 'Творог 5% — 150г', dinner: 'Овощи на пару + яйца' },
+    1: { breakfast: 'Овсянка + яйцо + огурец/помидор', lunch: 'Курица + гречка + салат из свежих овощей', snack: 'Яблоко + горсть орехов', dinner: 'Творог + огурец + зелень' },
+    2: { breakfast: 'Яичница из 2 яиц + томат + авокадо', lunch: 'Рыба на пару + бурый рис + брокколи', snack: 'Кефир / йогурт без сахара', dinner: 'Салат из шпината + яйца + оливковое масло' },
+    3: { breakfast: 'Творог + банан + немного мёда', lunch: 'Индейка + макароны из твёрдых сортов + салат', snack: 'Творог 5% — 150г', dinner: 'Куриная грудка + шпинат + помидоры' },
+    4: { breakfast: 'Гречка + молоко 1,5% + ягоды', lunch: 'Курица + киноа + запечённые овощи', snack: 'Яблоко + миндаль (10–15 шт)', dinner: 'Рыба + брокколи + лимонный сок' },
+    5: { breakfast: 'Омлет из 2 яиц + перец + зелень', lunch: 'Говядина на пару + гречка + салат', snack: 'Кефир / йогурт без сахара', dinner: 'Творог + помидор + базилик' },
+    6: { breakfast: 'Сырники из творога (без сахара) + сметана 10%', lunch: 'Любое блюдо из недели на выбор', snack: 'Творог 5% — 150г', dinner: 'Лёгкий овощной салат + оливковое масло' }
+  };
+
+  const scheduleData = {
+    0: { name: 'Воскресенье', activity: 'Отдых (растяжка 15 мин)', badge: 'badge-rest', badgeText: 'Отдых', workout: null },
+    1: { name: 'Понедельник', activity: 'Тренировка: Ноги + кор', badge: 'badge-workout', badgeText: 'Треня', workout: 'legs' },
+    2: { name: 'Вторник', activity: 'Ходьба быстрым шагом 20 мин', badge: 'badge-walk', badgeText: 'Ходьба', workout: null },
+    3: { name: 'Среда', activity: 'Тренировка: Руки + грудь', badge: 'badge-workout', badgeText: 'Треня', workout: 'upper' },
+    4: { name: 'Четверг', activity: 'Ходьба быстрым шагом 20 мин', badge: 'badge-walk', badgeText: 'Ходьба', workout: null },
+    5: { name: 'Пятница', activity: 'Тренировка: Смешанная', badge: 'badge-workout', badgeText: 'Треня', workout: 'full' },
+    6: { name: 'Суббота', activity: 'Плавание / велосипед / прогулка 1ч', badge: 'badge-active', badgeText: 'Актив', workout: null }
+  };
+
+  // --- Onboarding ---
+  let selectedGender = 'male';
+
+  function selectGender(gender) {
+    selectedGender = gender;
+    document.getElementById('genderMale').classList.toggle('selected', gender === 'male');
+    document.getElementById('genderFemale').classList.toggle('selected', gender === 'female');
+    updateTargetPreview();
+  }
+
+  function calcTargetWeight(height, gender) {
+    const h = height / 100;
+    const targetBMI = gender === 'male' ? 22.5 : 21.5;
+    return (targetBMI * h * h).toFixed(1);
+  }
+
+  function updateTargetPreview() {
+    const height = parseFloat(document.getElementById('obHeight').value);
+    const weight = parseFloat(document.getElementById('obWeight').value);
+    const preview = document.getElementById('targetPreview');
+    const previewValue = document.getElementById('targetPreviewValue');
+
+    if (height >= 100 && height <= 250 && weight >= 30 && weight <= 300) {
+      const target = calcTargetWeight(height, selectedGender);
+      previewValue.textContent = target + ' кг';
+      preview.style.display = 'block';
+    } else {
+      preview.style.display = 'none';
+    }
+  }
+
+  function startApp() {
+    const height = parseFloat(document.getElementById('obHeight').value);
+    const weight = parseFloat(document.getElementById('obWeight').value);
+
+    if (!height || height < 100 || height > 250) {
+      alert('Введите корректный рост (100–250 см)');
+      return;
+    }
+    if (!weight || weight < 30 || weight > 300) {
+      alert('Введите корректный вес (30–300 кг)');
+      return;
+    }
+
+    const targetWeight = parseFloat(calcTargetWeight(height, selectedGender));
+
+    profile = {
+      gender: selectedGender,
+      height: height,
+      startWeight: weight,
+      targetWeight: targetWeight
+    };
+
+    weights = [{ date: new Date().toLocaleDateString('ru-RU'), weight: weight }];
+
+    localStorage.setItem('swf_profile', JSON.stringify(profile));
+    localStorage.setItem('swf_weights', JSON.stringify(weights));
+
+    document.getElementById('onboarding').classList.add('hidden');
+    document.getElementById('appContainer').classList.add('active');
+    initApp();
+  }
+
+  function showSettings() {
+    const choice = confirm('Сбросить профиль и начать заново?\n\n(Данные можно предварительно экспортировать во вкладке Прогресс)');
+    if (choice) resetProfile();
+  }
+
+  function resetProfile() {
+    localStorage.removeItem('swf_profile');
+    localStorage.removeItem('swf_weights');
+    localStorage.removeItem('swf_water');
+    ['round1','round2','round3'].forEach(id => localStorage.removeItem('swf_' + id));
+    location.reload();
+  }
+
+  // --- Export / Import ---
+  function exportData() {
+    const data = {
+      profile: profile,
+      weights: weights,
+      water: waterState,
+      rounds: {
+        round1: localStorage.getItem('swf_round1') === 'true',
+        round2: localStorage.getItem('swf_round2') === 'true',
+        round3: localStorage.getItem('swf_round3') === 'true'
+      },
+      lastDate: localStorage.getItem('swf_lastDate'),
+      exportedAt: new Date().toISOString()
+    };
+    const json = JSON.stringify(data, null, 2);
+    const area = document.getElementById('exportOutput');
+    area.value = json;
+    area.style.display = 'block';
+    area.select();
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(json).then(() => alert('Данные скопированы в буфер обмена!'));
+    }
+  }
+
+  function importData() {
+    try {
+      const json = document.getElementById('importInput').value.trim();
+      if (!json) return;
+      const data = JSON.parse(json);
+
+      if (data.profile) {
+        profile = data.profile;
+        localStorage.setItem('swf_profile', JSON.stringify(profile));
+      }
+      if (data.weights) {
+        weights = data.weights;
+        localStorage.setItem('swf_weights', JSON.stringify(weights));
+      }
+      if (data.water) {
+        waterState = data.water;
+        localStorage.setItem('swf_water', JSON.stringify(waterState));
+      }
+      if (data.rounds) {
+        Object.entries(data.rounds).forEach(([k, v]) => localStorage.setItem('swf_' + k, v));
+      }
+      if (data.lastDate) {
+        localStorage.setItem('swf_lastDate', data.lastDate);
+      }
+
+      alert('Данные успешно импортированы!');
+      location.reload();
+    } catch (e) {
+      alert('Ошибка импорта: неверный формат данных');
+    }
+  }
+
+  // --- App Init ---
+  function initApp() {
+    if (!profile) {
+      document.getElementById('onboarding').classList.remove('hidden');
+      document.getElementById('appContainer').classList.remove('active');
+      return;
+    }
+    document.getElementById('onboarding').classList.add('hidden');
+    document.getElementById('appContainer').classList.add('active');
+    renderTodayStats();
+    renderWater();
+    renderToday();
+    renderWorkout();
+    renderWeekSchedule();
+    loadChecks();
+    renderWeights();
+  }
+
+  // --- Tabs ---
+  function switchTab(tabId) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + tabId).classList.add('active');
+    document.querySelectorAll('.tab-btn, .nav-btn').forEach(btn => {
+      if (btn.getAttribute('onclick').includes(tabId)) btn.classList.add('active');
+    });
+    if (tabId === 'today') renderTodayStats();
+    if (tabId === 'progress') renderWeights();
+  }
+
+  // --- Weight & BMI ---
+  function getCurrentWeight() {
+    if (weights.length > 0) return weights[0].weight;
+    return profile ? profile.startWeight : 0;
+  }
+
+  function calcBMI(weight) {
+    if (!profile) return 0;
+    const h = profile.height / 100;
+    return (weight / (h * h)).toFixed(1);
+  }
+
+  function getBMIPercent(bmi) {
+    const min = 16, max = 40;
+    let pct = ((bmi - min) / (max - min)) * 100;
+    return Math.max(0, Math.min(100, pct));
+  }
+
+  function renderTodayStats() {
+    if (!profile) return;
+    const w = getCurrentWeight();
+    const bmi = calcBMI(w);
+    const pct = getBMIPercent(bmi);
+
+    document.getElementById('todayWeight').textContent = w;
+    document.getElementById('todayHeight').textContent = profile.height;
+    document.getElementById('todayBMI').textContent = bmi;
+    document.getElementById('bmiFill').style.width = pct + '%';
+  }
+
+  // --- Water ---
+  let waterState = JSON.parse(localStorage.getItem('swf_water') || '[]');
+  if (waterState.length !== GLASSES) waterState = new Array(GLASSES).fill(false);
+
+  function renderWater() {
+    const container = document.getElementById('waterTracker');
+    container.innerHTML = '';
+    for (let i = 0; i < GLASSES; i++) {
+      const div = document.createElement('div');
+      div.className = 'water-glass' + (waterState[i] ? ' filled' : '');
+      div.textContent = waterState[i] ? '✓' : '';
+      div.onclick = () => toggleWater(i);
+      container.appendChild(div);
+    }
+    const filled = waterState.filter(Boolean).length;
+    document.getElementById('waterText').textContent = filled + ' / ' + GLASSES + ' стаканов (' + (filled * 250) + ' мл)';
+  }
+
+  function toggleWater(idx) {
+    waterState[idx] = !waterState[idx];
+    localStorage.setItem('swf_water', JSON.stringify(waterState));
+    renderWater();
+  }
+
+  // --- Today ---
+  function renderToday() {
+    const day = new Date().getDay();
+    const s = scheduleData[day];
+    const n = weeklyNutrition[day];
+
+    document.getElementById('todayContent').innerHTML = `
+      <div class="today-badge ${s.badge}">${s.badgeText}</div>
+      <div class="schedule-item">
+        <span class="day-name">${s.name}</span>
+        <span class="schedule-desc">${s.activity}</span>
+      </div>
+    `;
+
+    document.getElementById('todayNutrition').innerHTML = `
+      <div class="meal-item"><span class="meal-time">Завтрак</span><span class="meal-desc">${n.breakfast}</span></div>
+      <div class="meal-item"><span class="meal-time">Обед</span><span class="meal-desc">${n.lunch}</span></div>
+      <div class="meal-item"><span class="meal-time">Перекус</span><span class="meal-desc">${n.snack}</span></div>
+      <div class="meal-item"><span class="meal-time">Ужин</span><span class="meal-desc">${n.dinner}</span></div>
+    `;
+  }
+
+  // --- Workout ---
+  function renderWorkout() {
+    const day = new Date().getDay();
+    const s = scheduleData[day];
+    const workoutType = s.workout || 'full';
+    const exercises = workouts[workoutType];
+
+    const grid = document.getElementById('workoutGrid');
+    grid.innerHTML = exercises.map(ex => `
+      <div class="exercise-card">
+        <div class="exercise-name">${ex.name}</div>
+        <div class="exercise-reps">${ex.reps}</div>
+      </div>
+    `).join('');
+  }
+
+  // --- Week Schedule ---
+  function renderWeekSchedule() {
+    const container = document.getElementById('weekSchedule');
+    let html = '';
+    for (let d = 1; d <= 7; d++) {
+      const dayIdx = d % 7;
+      const s = scheduleData[dayIdx];
+      const n = weeklyNutrition[dayIdx];
+      html += `
+        <div class="day-row">
+          <span class="day-name">${s.name.slice(0,2)}</span>
+          <span class="day-activity">${s.activity}</span>
+          <span class="day-badge ${s.badge}">${s.badgeText}</span>
+        </div>
+        <div style="padding: 0 0 12px 102px; font-size: 11px; color: var(--text-dim); border-bottom: 1px solid var(--border);">
+          🍽️ ${n.breakfast.split('+')[0].trim()} / ${n.lunch.split('+')[0].trim()} / ${n.dinner.split('+')[0].trim()}
+        </div>
+      `;
+    }
+    container.innerHTML = html;
+  }
+
+  // --- Workout Checkboxes ---
+  function toggleCheck(el, id) {
+    const box = document.getElementById(id);
+    const text = document.getElementById('text-' + id);
+    const isChecked = box.classList.toggle('checked');
+    box.textContent = isChecked ? '✓' : '';
+    text.classList.toggle('done', isChecked);
+    localStorage.setItem('swf_' + id, isChecked);
+  }
+
+  function loadChecks() {
+    ['round1', 'round2', 'round3'].forEach(id => {
+      const saved = localStorage.getItem('swf_' + id) === 'true';
+      if (saved) {
+        const box = document.getElementById(id);
+        const text = document.getElementById('text-' + id);
+        box.classList.add('checked');
+        box.textContent = '✓';
+        text.classList.add('done');
+      }
+    });
+  }
+
+  // --- Weight Progress ---
+  function addWeight() {
+    const input = document.getElementById('weightInput');
+    const val = parseFloat(input.value);
+    if (!val || val < 40 || val > 200) {
+      alert('Введите корректный вес (40–200 кг)');
+      return;
+    }
+    const entry = { date: new Date().toLocaleDateString('ru-RU'), weight: val };
+    weights.unshift(entry);
+    localStorage.setItem('swf_weights', JSON.stringify(weights));
+    input.value = '';
+    renderWeights();
+    renderTodayStats();
+  }
+
+  function renderWeights() {
+    const list = document.getElementById('progressList');
+    const currentDisplay = document.getElementById('currentWeightDisplay');
+    const targetDisplay = document.getElementById('targetWeightDisplay');
+    const w = getCurrentWeight();
+    currentDisplay.textContent = w + ' кг';
+    targetDisplay.textContent = (profile && profile.targetWeight ? profile.targetWeight + ' кг' : 'не задан');
+
+    if (weights.length === 0) {
+      list.innerHTML = '<div class="empty-state">Пока нет записей. Добавь первое взвешивание!</div>';
+      return;
+    }
+    list.innerHTML = weights.map((w, i) => {
+      let diff = '';
+      if (i < weights.length - 1) {
+        const d = (w.weight - weights[i+1].weight).toFixed(1);
+        const sign = d > 0 ? '+' : '';
+        const color = d < 0 ? 'down' : 'up';
+        diff = `<span class="progress-diff ${color}">(${sign}${d})</span>`;
+      }
+      return `<div class="progress-item">
+        <span class="progress-date">${w.date}</span>
+        <span class="progress-weight">${w.weight} кг ${diff}</span>
+      </div>`;
+    }).join('');
+  }
+
+  // --- Reset daily ---
+  function checkDailyReset() {
+    const lastDate = localStorage.getItem('swf_lastDate');
+    const today = new Date().toDateString();
+    if (lastDate !== today) {
+      waterState = new Array(GLASSES).fill(false);
+      localStorage.setItem('swf_water', JSON.stringify(waterState));
+      ['round1', 'round2', 'round3'].forEach(id => localStorage.removeItem('swf_' + id));
+      localStorage.setItem('swf_lastDate', today);
+    }
+  }
+
+  // --- Init ---
+  checkDailyReset();
+  initApp();
+</script>
+
+</body>
+</html>
